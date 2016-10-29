@@ -1,26 +1,36 @@
 package main
 
 import (
-	"github.com/valyala/fasthttp"
+	"log"
+	"net/http"
 	"sync"
 )
 
-func main() {
-	mutex := &sync.Mutex{}
-	m := make(map[int][]byte)
-	cnt := 0
-	max := 250000
+const maxMapSize = 250000
 
-	handler := func(ctx *fasthttp.RequestCtx) {
-		newBuffer := make([]byte, 1024)
-		mutex.Lock()
-		m[cnt] = newBuffer
-		if cnt >= max {
-			delete(m, cnt-max)
-		}
-		cnt = cnt + 1
-		mutex.Unlock()
-		ctx.WriteString("OK")
+type server struct {
+	sync.Mutex
+	IDs   map[int][]byte
+	Count int
+}
+
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	buf := make([]byte, 1024)
+
+	s.Lock()
+	s.IDs[s.Count] = buf
+	if s.Count >= maxMapSize {
+		delete(s.IDs, s.Count-maxMapSize)
 	}
-	fasthttp.ListenAndServe(":8080", handler)
+	s.Count++
+	s.Unlock()
+
+	w.Write([]byte("OK"))
+}
+
+func main() {
+	srv := &server{
+		IDs: make(map[int][]byte),
+	}
+	log.Fatal(http.ListenAndServe(":8080", srv))
 }
