@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
-docker run -tid -p 8080:8080 \
+docker build -t hashtable-swift .
+docker run --rm \
     -v "$PWD":/hashtable-latencies \
     -w /hashtable-latencies \
     hashtable-swift \
-    .build/release/swift-zewo
+    swift build --configuration release

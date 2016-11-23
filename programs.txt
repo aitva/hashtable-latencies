@@ -1,2 +1,1 @@
-haskell node ocaml-reason swift-zewo go
-python-uwsgi
+haskell node ocaml-reason go python-uwsgi
