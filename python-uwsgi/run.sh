@@ -1,6 +1,11 @@
 #!/bin/sh
-export PYTHONUSERBASE=$PWD/pyenv
-exec $PYTHONUSERBASE/bin/uwsgi --master --die-on-term --disable-logging \
+set -e
+docker run -tid -p 8080:8080 \
+    -v "$PWD":/hashtable-latencies \
+    -w /hashtable-latencies \
+    -e PYTHONUSERBASE=/usr/src/hashtable-latencies/pyenv \
+    python:latest \
+    pyenv/bin/uwsgi --master --die-on-term --disable-logging \
     --wsgi-file main.py \
     --http-socket :8080
     # --plugin gevent --gevent 1000
