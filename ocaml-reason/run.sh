@@ -1,5 +1,3 @@
 #!/bin/sh
 set -e
-opam install -y lwt cohttp
-ocamlbuild -pkgs cohttp,lwt,cohttp.lwt Main.native
-exec ./Main.native
+docker run --rm -tiv "$PWD":/hashtable-latencies -w /hashtable-latencies hashtable-ocaml ./Main.native
